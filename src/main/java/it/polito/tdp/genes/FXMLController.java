@@ -1,8 +1,10 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.genes.model.ArcoGrafo;
 import it.polito.tdp.genes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,26 +33,45 @@ public class FXMLController {
 
     @FXML
     private TextArea txtResult;
-    
+
     @FXML
     void doRicerca(ActionEvent event) {
-    	String localizzazione = boxLocalizzazione.getValue();
+
+    	txtResult.clear();
+    	if(!this.model.grafoCreato()) {
+    		txtResult.setText("Crea prima il grafo!");
+    		return;
+    	}
+    	String localization = this.boxLocalizzazione.getValue();
+    	if(localization==null) {
+    		txtResult.setText("Seleziona una localizzazione!");
+    		return;
+    	}
     	
-    	model.percorsoLungo(localizzazione);
-    	
-    	if(model.getPercorsoLungo()==null) {
-    		txtResult.appendText("Percorso vuoto");
-    	} else {
-    		for(String s : model.getPercorsoLungo()) {
-    			txtResult.appendText(s+"\n");
-    		}
+    	this.model.init(localization);
+    	txtResult.appendText("CAMMINO TROVATO : \n");
+    	for(ArcoGrafo e : this.model.getBestCammino()) {
+    		txtResult.appendText(e.toString()+"\n");
     	}
     }
 
     @FXML
     void doStatistiche(ActionEvent event) {
+
     	txtResult.clear();
-    	txtResult.appendText(model.getVicini(boxLocalizzazione.getValue()));
+    	this.model.creaGrafo();
+    	txtResult.appendText("Grafo creato!\n");
+    	txtResult.appendText("# VERTICI : "+this.model.getNVertici()+"\n");
+    	txtResult.appendText("# ARCHI : "+this.model.getNArchi()+"\n");
+    	
+    	String localization = this.boxLocalizzazione.getValue();
+    	if(localization!=null) {
+    		List<ArcoGrafo> result = this.model.getAdiacenze(localization);
+    		txtResult.appendText("Adiacenti a : "+localization+"\n");
+    		for(ArcoGrafo e : result) {
+    			txtResult.appendText(e.toString()+"\n");
+    		}
+    	}
     }
 
     @FXML
@@ -64,8 +85,6 @@ public class FXMLController {
 
 	public void setModel(Model model) {
 		this.model = model;
-		txtResult.clear();
-		txtResult.appendText(model.creaGrafo());
-		boxLocalizzazione.getItems().addAll(model.getLocalizzazioni());
+		this.boxLocalizzazione.getItems().addAll(this.model.getVertici());
 	}
 }

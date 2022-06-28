@@ -2,6 +2,11 @@ package it.polito.tdp.genes.model;
 
 public class ArcoGrafo {
 
+	@Override
+	public String toString() {
+		return "localization1=" + localization1 + ", localization2=" + localization2 + ", peso=" + peso
+				+ "";
+	}
 	private String localization1;
 	private String localization2;
 	private Integer peso;
